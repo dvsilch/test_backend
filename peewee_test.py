@@ -2,7 +2,7 @@ import peewee
 import datetime
 import time
 import flask_login
-from peewee import fn
+from peewee import fn, JOIN
 
 from playhouse.pool import PooledPostgresqlExtDatabase, PostgresqlExtDatabase
 from flask import Flask, request, Response, json, jsonify
@@ -69,9 +69,9 @@ class Post(Resource):
     def get(self):
         post = (
             PostModel.select(PostModel)
-            .join(CommentModel)
+            .join(CommentModel, JOIN.LEFT_OUTER)
             .where(PostModel.is_delete == False)
-            .order_by(fn.MAX(CommentModel.timestamp).desc())
+            .order_by(fn.MAX(CommentModel.timestamp).desc(), PostModel.timestamp.desc())
             .group_by(PostModel)
         )
         results = []
