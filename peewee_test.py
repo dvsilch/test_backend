@@ -68,12 +68,12 @@ class CommentModel(BaseModel):
 class Post(Resource):
     def get(self):
         post = (
-            PostModel.select(PostModel, fn.MAX(CommentModel.timestamp).alias('time'))
+            PostModel.select(PostModel)
             .join(CommentModel)
             .where(PostModel.is_delete == False)
+            .order_by(fn.MAX(CommentModel.timestamp).desc())
             .group_by(PostModel)
         )
-        # post = post.order_by(post.c.time.desc())
         results = []
         for i in post:
             results.append(
